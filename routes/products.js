@@ -7,7 +7,15 @@ const v = new Validator();
 
 /* GET products listing. */
 router.get("/", async (req, res, next) => {
-  res.send(process.env.APP_NAME);
+  const products = await Product.findAll();
+  return res.json(products);
+});
+
+/* GET product by id. */
+router.get("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  const products = await Product.findByPk(id);
+  return res.json(products || {});
 });
 
 /* POST product OR Create product. */
@@ -55,6 +63,25 @@ router.put("/:id", async (req, res, next) => {
   // update data
   product = await product.update(req.body);
   res.json(product);
+});
+
+/* DELETE product by id. */
+router.delete("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  // cek data
+  let product = await Product.findByPk(id);
+
+  if (!product) {
+    return res.json({
+      message: "Data not found",
+    });
+  }
+
+  // delete data
+  product = await product.destroy();
+  res.json({
+    message: "Product deleted.",
+  });
 });
 
 module.exports = router;
